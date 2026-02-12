@@ -6,14 +6,14 @@ import path from "path";
 import { fileURLToPath } from "url"; // Because ES module does not support __dirname and __filename
 import methodOverride from "method-override";
 import ejsMate from "ejs-mate";
+import { asyncHandler } from "./utils/asyncHandler.js";
+import { ApiError } from "./utils/apiError.js";
+import { joiListingSchema } from "./validations/listing.validation.js";
+import { validate } from "./middlewares/validate.js";
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
-
-app.listen(port, "0.0.0.0.", () => {
-  console.log(`Server is listening to port ${port}`);
-});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -44,24 +44,22 @@ app.get("/", (req, res) => {
 });
 
 // Test Listing:
-app.get("/testListing", async (req, res) => {
-  let sampleListing = new Listing({
-    title: "My New Villa",
-    description: "By the Beach",
-    price: 1200,
-    location: "Goa",
-    country: "India",
-  });
-
-  await sampleListing
-    .save()
-    .then(() => {
-      res.send("Testing successful");
-    })
-    .catch((err) => {
-      console.log(err);
+app.get(
+  "/testListing",
+  asyncHandler(async (req, res) => {
+    let sampleListing = new Listing({
+      title: "My New Villa",
+      description: "By the Beach",
+      price: 1200,
+      location: "Goa",
+      country: "India",
     });
-});
+
+    await sampleListing.save().then(() => {
+      res.send("Testing successful");
+    });
+  }),
+);
 
 // New Route:
 app.get("/listings/new", (req, res) => {
@@ -69,69 +67,98 @@ app.get("/listings/new", (req, res) => {
 });
 
 // Create Route:
-app.post("/listings", async (req, res) => {
-  const newListing = req.body;
-  console.log(req.body);
-  const listing = new Listing(newListing);
-  listing
-    .save()
-    .then((data) => {
+app.post(
+  "/listings",
+  validate(joiListingSchema, "body"),
+  asyncHandler(async (req, res) => {
+    const newListing = req.body;
+    const listing = new Listing(newListing);
+    listing.save().then((data) => {
       res.redirect("/listings");
-    })
-    .catch((err) => {
-      console.log(err);
     });
-});
+  }),
+);
 
 // Index Route:
-app.get("/listings", async (req, res) => {
-  const allListings = await Listing.find({});
-  res.render("listings/index.ejs", { allListings });
-});
+app.get(
+  "/listings",
+  asyncHandler(async (req, res) => {
+    const allListings = await Listing.find({});
+    res.render("listings/index.ejs", { allListings });
+  }),
+);
 
 // Show Route:
-app.get("/listings/:id", async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listings/show.ejs", { listing });
-});
+app.get(
+  "/listings/:id",
+  asyncHandler(async (req, res) => {
+    let { id } = req.params;
+    const listing = await Listing.findById(id);
+    res.render("listings/show.ejs", { listing });
+  }),
+);
 
 // Edit Route:
-app.get("/listings/:id/edit", async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listings/edit.ejs", { listing });
-});
+app.get(
+  "/listings/:id/edit",
+  asyncHandler(async (req, res) => {
+    let { id } = req.params;
+    const listing = await Listing.findById(id);
+    if (!listing) {
+      throw new ApiError(400, "No listing found!");
+    }
+    res.render("listings/edit.ejs", { listing });
+  }),
+);
 
 // Update Route:
-app.patch("/listings/:id", async (req, res) => {
-  const { id } = req.params;
-  const { title, description, image, price, location, country } = req.body;
+app.patch(
+  "/listings/:id",
+  validate(joiListingSchema, "body"),
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { title, description, image, price, location, country } = req.body;
 
-  const updates = {};
-  if (title) updates.title = title;
-  if (description) updates.description = description;
-  if (image) updates.image = image;
-  if (price) updates.price = price;
-  if (location) updates.location = location;
-  if (country) updates.country = country;
+    const updates = {};
+    if (title) updates.title = title;
+    if (description) updates.description = description;
+    if (image) updates.image = image;
+    if (price) updates.price = price;
+    if (location) updates.location = location;
+    if (country) updates.country = country;
 
-  const listing = await Listing.findByIdAndUpdate(
-    id,
-    {
-      $set: updates,
-    },
-    {
-      runValidators: true,
-      new: true,
-    },
-  );
-  res.redirect(`/listings/${id}`);
-});
+    const listing = await Listing.findByIdAndUpdate(
+      id,
+      {
+        $set: updates,
+      },
+      {
+        runValidators: true,
+        new: true,
+      },
+    );
+    res.redirect(`/listings/${id}`);
+  }),
+);
 
 // Delete Route:
-app.delete("/listings/:id", async (req, res) => {
-  const { id } = req.params;
-  await Listing.findByIdAndDelete(id);
-  res.redirect("/listings");
+app.delete(
+  "/listings/:id",
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    await Listing.findByIdAndDelete(id);
+    res.redirect("/listings");
+  }),
+);
+
+app.use((req, res, next) => {
+  next(new ApiError(400, "Page not found!"));
+});
+
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).render("errors/error.ejs", { err });
+});
+
+app.listen(port, "0.0.0.0.", () => {
+  console.log(`Server is listening to port ${port}`);
 });
