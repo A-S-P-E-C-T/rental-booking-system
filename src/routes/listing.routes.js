@@ -86,7 +86,7 @@ listingRouter.route("/:id").patch(
 listingRouter.route("/:id").delete(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
-    await Listing.findByIdAndDelete(id);
+    await Listing.findOneAndDelete({ _id: id });
     res.redirect("/listings");
   }),
 );

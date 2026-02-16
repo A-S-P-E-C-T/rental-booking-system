@@ -69,7 +69,7 @@ body {
     align-items: space-evenly;
 }
 
-.card {
+.listing-card {
     border: none !important;
     margin-bottom: 2rem;
 }
@@ -85,23 +85,19 @@ body {
     padding: 0rem;
 }
 
-.idx-card-text p {
-    font-weight: 400 !important;
-}
-
 .listing-link {
     text-decoration: none;
 }
 
-.card-img-overlay {
+.listing-card-img-overlay {
     opacity: 0;
 }
-.card-img-overlay:hover {
+.listing-card-img-overlay:hover {
     opacity: 0.2;
     background-color: white;
 }
 
-.card:hover{
+.listing-card:hover{
     transform: scale(1.02);
 }
 
@@ -120,4 +116,10 @@ body {
 
 .show-card:hover{
     transform: scale(1) !important;
+}
+
+.review-card {
+    margin-bottom: 2rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
 }

@@ -28,4 +28,15 @@ reviewRouter.route("/create").post(
   }),
 );
 
+reviewRouter.route("/:reviewId/delete").delete(
+  asyncHandler(async (req, res) => {
+    const { id: listingId, reviewId } = req.params;
+    await Listing.findByIdAndUpdate(listingId, {
+      $pull: { reviews: reviewId },
+    });
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/listings/${listingId}`);
+  }),
+);
+
 export { reviewRouter };
