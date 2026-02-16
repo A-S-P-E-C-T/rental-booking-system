@@ -21,9 +21,11 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 import { listingRouter } from "./routes/listing.routes.js";
 import { homeRouter } from "./routes/home.routes.js";
+import { reviewRouter } from "./routes/review.routes.js";
 
 app.use("/", homeRouter);
 app.use("/listings", listingRouter);
+app.use("/listings/:id/reviews", reviewRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

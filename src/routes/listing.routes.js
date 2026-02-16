@@ -36,7 +36,7 @@ listingRouter.route("/").get(
 listingRouter.route("/:id").get(
   asyncHandler(async (req, res) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate("reviews");
     res.render("templates/listings/show.ejs", { listing });
   }),
 );
