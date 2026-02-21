@@ -19,6 +19,7 @@ listingRouter.route("/").post(
     const newListing = req.body;
     const listing = new Listing(newListing);
     listing.save().then((data) => {
+      req.flash("success", "Listing created successfully!");
       res.redirect("/listings");
     });
   }),
@@ -37,6 +38,10 @@ listingRouter.route("/:id").get(
   asyncHandler(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
+    if (!listing) {
+      req.flash("error", "Listing not found!");
+      return res.redirect("/listings");
+    }
     res.render("templates/listings/show.ejs", { listing });
   }),
 );
@@ -47,7 +52,8 @@ listingRouter.route("/:id/edit").get(
     let { id } = req.params;
     const listing = await Listing.findById(id);
     if (!listing) {
-      throw new ApiError(400, "No listing found!");
+      req.flash("error", "Listing not found!");
+      return res.redirect("/listings");
     }
     res.render("templates/listings/edit.ejs", { listing });
   }),
@@ -78,6 +84,7 @@ listingRouter.route("/:id").patch(
         new: true,
       },
     );
+    req.flash("success", "Listing updated successfully!");
     res.redirect(`/listings/${id}`);
   }),
 );
@@ -87,6 +94,7 @@ listingRouter.route("/:id").delete(
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     await Listing.findOneAndDelete({ _id: id });
+    req.flash("success", "Listing deleted successfully!");
     res.redirect("/listings");
   }),
 );

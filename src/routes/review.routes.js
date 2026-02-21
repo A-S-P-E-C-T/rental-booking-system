@@ -23,6 +23,7 @@ reviewRouter.route("/create").post(
     listing.save();
 
     review.save().then((data) => {
+      req.flash("success", "Review created successfully!");
       res.redirect(`/listings/${listingId}`);
     });
   }),
@@ -34,8 +35,10 @@ reviewRouter.route("/:reviewId/delete").delete(
     await Listing.findByIdAndUpdate(listingId, {
       $pull: { reviews: reviewId },
     });
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/listings/${listingId}`);
+    await Review.findByIdAndDelete(reviewId).then(() => {
+      req.flash("success", "Review deleted successfully!");
+      res.redirect(`/listings/${listingId}`);
+    });
   }),
 );
 
