@@ -8,6 +8,9 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 import session from "express-session";
 import flash from "connect-flash";
 import { showFlash } from "./middlewares/flash.middleware.js";
+import User from "./models/user.model.js";
+import passport from "passport";
+import LocalStrategy from "passport-local";
 
 const app = express();
 
@@ -36,14 +39,21 @@ const sessionOptions = {
 app.use(session(sessionOptions));
 app.use(flash());
 app.use(showFlash);
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 import { listingRouter } from "./routes/listing.routes.js";
-import { homeRouter } from "./routes/home.routes.js";
 import { reviewRouter } from "./routes/review.routes.js";
+import userRouter from "./routes/user.routes.js";
 
-app.use("/", homeRouter);
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
+app.use("/", userRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
