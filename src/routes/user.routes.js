@@ -43,4 +43,14 @@ userRouter
     }),
   );
 
+userRouter.route("/logout").get((req, res) => {
+  req.logout((error) => {
+    if (error) {
+      next(err);
+    }
+    req.flash("success", "You are logged out of WonderPad");
+    res.redirect("/listings");
+  });
+});
+
 export default userRouter;
