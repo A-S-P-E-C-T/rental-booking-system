@@ -3,17 +3,18 @@ import { joiListingSchema } from "../validations/validator.js";
 import { validate } from "../middlewares/validate.js";
 import Listing from "../models/listing.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/apiError.js";
+import isLoggedIn from "../middlewares/authenticate.middlewares.js";
 
 const listingRouter = Router();
 
 // New Route:
-listingRouter.route("/new").get((req, res) => {
+listingRouter.route("/new").get(isLoggedIn, (req, res) => {
   res.render("templates/listings/new.ejs");
 });
 
 // Create Route:
 listingRouter.route("/").post(
+  isLoggedIn,
   validate(joiListingSchema, "body"),
   asyncHandler(async (req, res) => {
     const newListing = req.body;
@@ -48,7 +49,7 @@ listingRouter.route("/:id").get(
 
 // Edit Route:
 listingRouter.route("/:id/edit").get(
-  asyncHandler(async (req, res) => {
+  asyncHandler(isLoggedIn, async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
     if (!listing) {
@@ -61,6 +62,7 @@ listingRouter.route("/:id/edit").get(
 
 // Update Route:
 listingRouter.route("/:id").patch(
+  isLoggedIn,
   validate(joiListingSchema, "body"),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -91,6 +93,7 @@ listingRouter.route("/:id").patch(
 
 // Delete Route:
 listingRouter.route("/:id").delete(
+  isLoggedIn,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     await Listing.findOneAndDelete({ _id: id });
