@@ -12,8 +12,8 @@
     style="height: 20rem"
   />
   <div class="card-body">
-    <p class="card-title">Owned by: <i><%= listing.owner.username %></i></p>
-    <p class="card-text"><%= listing.description %></p
+    <p class="card-title">Owned by:<b><i> <%= listing.owner.username %></i></b></p>
+    <p class="card-text"><%= listing.description %></p>
     <p class="card-price">
       &#8377;<%= listing.price.toLocaleString("en-In") %> / night
     </p>
@@ -39,16 +39,29 @@
 <div class="create-review row">
     <h5 class="fw-bold col offset-3">Write a Review:</h5>
     <form action="/listings/<%= listing._id %>/reviews/create" method="POST" novalidate class="needs-validation col-6 offset-3">
-      <div class="row mb-3 mt-3">
-      <label for="ratedStars" class="fw-bold form-label">Rate out of 5:</label>
-      <input type="range" name="ratedStars" id="ratedStars" min="1" max="5" step="1" class="form-range">
+      <div class="row">
+      <label for="ratedStars" class="fw-bold form-label">Rating:</label>
+      <fieldset class="starability-slot">
+        <input type="radio" id="no-rate" class="input-no-rate"
+         name="ratedStars" value="0" checked />
+        <input type="radio" id="first-rate1" name="ratedStars" value="1" />
+        <label for="first-rate1">1 star</label>
+        <input type="radio" id="first-rate2" name="ratedStars" value="2" />
+        <label for="first-rate2">2 stars</label>
+        <input type="radio" id="first-rate3" name="ratedStars" value="3" />
+        <label for="first-rate3">3 stars</label>
+        <input type="radio" id="first-rate4" name="ratedStars" value="4" />
+        <label for="first-rate4">4 stars</label>
+        <input type="radio" id="first-rate5" name="ratedStars" value="5" />
+        <label for="first-rate5">5 stars</label>
+      </fieldset>
       </div>
-      <div class="row mb-3 mt-3">
+      <div class="row mb-3">
       <label for="comment" class="fw-bold form-label">Comment:</label>
       <textarea name="comment" id="comment" placeholder="Write your review here..." class="form-control"></textarea>
       <div class="invalid-feedback">Comment can not be empty</div>
       </div>
-      <div class="row mb-3 mt-3 justify-content-center">
+      <div class="row mb-3 justify-content-center">
       <button class="btn btn-primary col col-lg-2 col-md-3 col-sm-3">Post</button>
       </div>
     </form>
@@ -59,7 +72,7 @@
     <div class="card review-card col-6 offset-3">
   <div class="card-body">
     <p class="card-title"><b><i>@<%= review.author.username %></i></b></p>
-    <p class="card-text"><b>Rated Stars:</b><%= review.ratedStars %></p>
+    <p class="starability-result" data-rating="<%= review.ratedStars %>"></p>
     <p class="card-text"><%= review.comment %></p>
     <% if(currUser && review.author._id.equals(currUser._id)) { %>
     <div class="card-link">
