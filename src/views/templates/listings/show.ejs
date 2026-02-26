@@ -34,9 +34,10 @@
 <div class="reviews">
   <h3 class="fw-bold text-center">Reviews</h3>
 <div class="col offset-3">
-<h5 class="fw-bold">Write a Review:</h5>
 </div>
-  <div class="create-review row">
+<% if(currUser) { %>
+<div class="create-review row">
+    <h5 class="fw-bold col offset-3">Write a Review:</h5>
     <form action="/listings/<%= listing._id %>/reviews/create" method="POST" novalidate class="needs-validation col-6 offset-3">
       <div class="row mb-3 mt-3">
       <label for="ratedStars" class="fw-bold form-label">Rate out of 5:</label>
@@ -52,19 +53,23 @@
       </div>
     </form>
   </div>
+  <% } %>
   <div class="all-reviews row">
-    <%for(review of listing.reviews){%>
+    <%for(review of listing.reviews) { %>
     <div class="card review-card col-6 offset-3">
   <div class="card-body">
+    <p class="card-title"><b><i>@<%= review.author.username %></i></b></p>
     <p class="card-text"><b>Rated Stars:</b><%= review.ratedStars %></p>
     <p class="card-text"><%= review.comment %></p>
+    <% if(currUser && review.author._id.equals(currUser._id)) { %>
     <div class="card-link">
       <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>/delete?_method=DELETE" method="POST">
         <button class="btn btn-dark">Delete</button>
       </form>
     </div>
+    <% } %>
   </div>
 </div>
-    <%}%>
+<% } %>
   </div>
 </div>

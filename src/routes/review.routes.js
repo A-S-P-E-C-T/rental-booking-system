@@ -2,9 +2,10 @@ import { Router } from "express";
 import { joiReviewSchema } from "../validations/validator.js";
 import { validate } from "../middlewares/validate.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { Review } from "../models/review.model.js";
+import Review from "../models/review.model.js";
 import Listing from "../models/listing.model.js";
 import { isLoggedIn } from "../middlewares/auth.middlewares.js";
+import { reviewAuthor } from "../middlewares/auth.middlewares.js";
 
 const reviewRouter = Router({ mergeParams: true });
 
@@ -16,6 +17,7 @@ reviewRouter.route("/create").post(
   asyncHandler(async (req, res) => {
     const { id: listingId } = req.params;
     const newReview = req.body;
+    newReview.author = req.user._id;
     const review = new Review(newReview);
 
     const listing = await Listing.findById(listingId);
@@ -31,6 +33,7 @@ reviewRouter.route("/create").post(
 
 reviewRouter.route("/:reviewId/delete").delete(
   isLoggedIn,
+  reviewAuthor,
   asyncHandler(async (req, res) => {
     const { id: listingId, reviewId } = req.params;
     await Listing.findByIdAndUpdate(listingId, {

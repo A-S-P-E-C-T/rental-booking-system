@@ -5,6 +5,7 @@ import Listing from "../models/listing.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { isLoggedIn } from "../middlewares/auth.middlewares.js";
 import { listingOwner } from "../middlewares/auth.middlewares.js";
+import Review from "../models/review.model.js";
 
 const listingRouter = Router();
 
@@ -40,7 +41,16 @@ listingRouter.route("/").get(
 listingRouter.route("/:id").get(
   asyncHandler(async (req, res) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews owner");
+
+    const listing = await Listing.findById(id)
+      .populate("owner")
+      .populate({
+        path: "reviews",
+        populate: {
+          path: "author",
+        },
+      });
+
     if (!listing) {
       req.flash("error", "Listing not found!");
       return res.redirect("/listings");

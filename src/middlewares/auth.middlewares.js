@@ -1,4 +1,5 @@
 import Listing from "../models/listing.model.js";
+import Review from "../models/review.model.js";
 
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
@@ -31,4 +32,17 @@ const listingOwner = async (req, res, next) => {
   next();
 };
 
-export { isLoggedIn, saveRedirectUrl, listingOwner };
+const reviewAuthor = async (req, res, next) => {
+  const { id, reviewId } = req.params;
+  const review = await Review.findById(reviewId);
+  if (!review) {
+    throw new ApiError(400, "Review not found.");
+  }
+  if (!review.author.equals(req.user._id)) {
+    req.flash("error", "You are not the author of this review.");
+    return res.redirect(`/listings/${id}`);
+  }
+  next();
+};
+
+export { isLoggedIn, saveRedirectUrl, listingOwner, reviewAuthor };
