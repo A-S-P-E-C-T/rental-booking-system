@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { joiReviewSchema } from "../validations/validator.js";
+import { joiUserSchema } from "../validations/validator.js";
 import { validate } from "../middlewares/validate.js";
 import User from "../models/user.model.js";
 import passport from "passport";
-import { saveRedirectUrl } from "../middlewares/authenticate.middlewares.js";
+import { saveRedirectUrl } from "../middlewares/auth.middlewares.js";
 
 const userRouter = Router();
 
@@ -14,6 +14,7 @@ userRouter
     res.render("templates/user/signup");
   })
   .post(
+    validate(joiUserSchema, "body"),
     asyncHandler(async (req, res) => {
       try {
         const { username, email, password } = req.body;

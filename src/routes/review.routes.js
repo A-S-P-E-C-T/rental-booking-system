@@ -4,7 +4,7 @@ import { validate } from "../middlewares/validate.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Review } from "../models/review.model.js";
 import Listing from "../models/listing.model.js";
-import { isLoggedIn } from "../middlewares/authenticate.middlewares.js";
+import { isLoggedIn } from "../middlewares/auth.middlewares.js";
 
 const reviewRouter = Router({ mergeParams: true });
 

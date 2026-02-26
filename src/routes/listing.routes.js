@@ -3,13 +3,14 @@ import { joiListingSchema } from "../validations/validator.js";
 import { validate } from "../middlewares/validate.js";
 import Listing from "../models/listing.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { isLoggedIn } from "../middlewares/authenticate.middlewares.js";
+import { isLoggedIn } from "../middlewares/auth.middlewares.js";
+import { listingOwner } from "../middlewares/auth.middlewares.js";
 
 const listingRouter = Router();
 
 // New Route:
 listingRouter.route("/new").get(isLoggedIn, (req, res) => {
-  res.render("templates/listings/new.ejs");
+  return res.render("templates/listings/new.ejs");
 });
 
 // Create Route:
@@ -18,10 +19,11 @@ listingRouter.route("/").post(
   validate(joiListingSchema, "body"),
   asyncHandler(async (req, res) => {
     const newListing = req.body;
+    newListing.owner = req.user._id;
     const listing = new Listing(newListing);
     listing.save().then((data) => {
       req.flash("success", "Listing created successfully!");
-      res.redirect("/listings");
+      return res.redirect("/listings");
     });
   }),
 );
@@ -30,7 +32,7 @@ listingRouter.route("/").post(
 listingRouter.route("/").get(
   asyncHandler(async (req, res) => {
     const allListings = await Listing.find({});
-    res.render("templates/listings/index.ejs", { allListings });
+    return res.render("templates/listings/index.ejs", { allListings });
   }),
 );
 
@@ -38,31 +40,34 @@ listingRouter.route("/").get(
 listingRouter.route("/:id").get(
   asyncHandler(async (req, res) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
+    const listing = await Listing.findById(id).populate("reviews owner");
     if (!listing) {
       req.flash("error", "Listing not found!");
       return res.redirect("/listings");
     }
-    res.render("templates/listings/show.ejs", { listing });
+    return res.render("templates/listings/show.ejs", { listing });
   }),
 );
 
 // Edit Route:
 listingRouter.route("/:id/edit").get(
-  asyncHandler(isLoggedIn, async (req, res) => {
+  isLoggedIn,
+  listingOwner,
+  asyncHandler(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
     if (!listing) {
       req.flash("error", "Listing not found!");
       return res.redirect("/listings");
     }
-    res.render("templates/listings/edit.ejs", { listing });
+    return res.render("templates/listings/edit.ejs", { listing });
   }),
 );
 
 // Update Route:
 listingRouter.route("/:id").patch(
   isLoggedIn,
+  listingOwner,
   validate(joiListingSchema, "body"),
   asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -76,7 +81,7 @@ listingRouter.route("/:id").patch(
     if (location) updates.location = location;
     if (country) updates.country = country;
 
-    const listing = await Listing.findByIdAndUpdate(
+    const updatedListing = await Listing.findByIdAndUpdate(
       id,
       {
         $set: updates,
@@ -87,18 +92,19 @@ listingRouter.route("/:id").patch(
       },
     );
     req.flash("success", "Listing updated successfully!");
-    res.redirect(`/listings/${id}`);
+    return res.redirect(`/listings/${id}`);
   }),
 );
 
 // Delete Route:
 listingRouter.route("/:id").delete(
   isLoggedIn,
+  listingOwner,
   asyncHandler(async (req, res) => {
     const { id } = req.params;
     await Listing.findOneAndDelete({ _id: id });
     req.flash("success", "Listing deleted successfully!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }),
 );
 
