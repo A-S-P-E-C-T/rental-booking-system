@@ -3,7 +3,7 @@ import { joiListingSchema } from "../validations/validator.js";
 import { validate } from "../middlewares/validate.js";
 import Listing from "../models/listing.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import isLoggedIn from "../middlewares/authenticate.middlewares.js";
+import { isLoggedIn } from "../middlewares/authenticate.middlewares.js";
 
 const listingRouter = Router();
 

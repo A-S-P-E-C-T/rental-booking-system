@@ -4,6 +4,7 @@ import { joiReviewSchema } from "../validations/validator.js";
 import { validate } from "../middlewares/validate.js";
 import User from "../models/user.model.js";
 import passport from "passport";
+import { saveRedirectUrl } from "../middlewares/authenticate.middlewares.js";
 
 const userRouter = Router();
 
@@ -38,13 +39,14 @@ userRouter
     res.render("templates/user/login");
   })
   .post(
+    saveRedirectUrl,
     passport.authenticate("local", {
       failureRedirect: "/login",
       failureFlash: true,
     }),
     asyncHandler(async (req, res) => {
       req.flash("success", "Welcome back to WanderPad");
-      res.redirect("/listings");
+      res.redirect(res.locals.redirectUrl || "/listings");
     }),
   );
 
