@@ -12,6 +12,9 @@ import {
   updateListing,
   deleteListing,
 } from "../controllers/listing.controllers.js";
+import multer from "multer";
+import { storage } from "../config/cloud.config.js";
+const upload = multer({ storage });
 
 const listingRouter = Router();
 
@@ -22,7 +25,12 @@ listingRouter.route("/new").get(isLoggedIn, newListing);
 listingRouter
   .route("/")
   .get(listingIndex)
-  .post(isLoggedIn, validate(joiListingSchema, "body"), createListing);
+  .post(
+    isLoggedIn,
+    upload.single("listing-image"),
+    validate(joiListingSchema, "body"),
+    createListing,
+  );
 
 // Render Edit Form:
 listingRouter.route("/:id/edit").get(isLoggedIn, listingOwner, editListing);
@@ -34,6 +42,7 @@ listingRouter
   .patch(
     isLoggedIn,
     listingOwner,
+    upload.single("listing-image"),
     validate(joiListingSchema, "body"),
     updateListing,
   )

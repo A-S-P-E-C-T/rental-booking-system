@@ -6,10 +6,20 @@ const newListing = (req, res) => {
 };
 
 const createListing = asyncHandler(async (req, res) => {
-  const newListing = req.body;
+  if (!req.file) {
+    req.flash("error", "Image is required.");
+    return res.redirect(`/listings/new`);
+  }
+  const { path: image, filename } = req.file;
+
+  const newListing = new Listing(req.body);
+  newListing.image = {
+    imageUrl: image,
+    filename: filename,
+  };
   newListing.owner = req.user._id;
-  const listing = new Listing(newListing);
-  listing.save().then((data) => {
+
+  newListing.save().then((data) => {
     req.flash("success", "Listing created successfully!");
     return res.redirect("/listings");
   });
@@ -22,7 +32,6 @@ const listingIndex = asyncHandler(async (req, res) => {
 
 const showListing = asyncHandler(async (req, res) => {
   let { id } = req.params;
-
   const listing = await Listing.findById(id)
     .populate("owner")
     .populate({
@@ -51,12 +60,21 @@ const editListing = asyncHandler(async (req, res) => {
 
 const updateListing = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, description, image, price, location, country } = req.body;
+  if (!req.file) {
+    req.flash("error", "Image is required.");
+    res.redirect(`/listings/${id}/edit`);
+  }
+  const { title, description, price, location, country } = req.body;
+  const { path: image, filename } = req.file;
 
   const updates = {};
   if (title) updates.title = title;
   if (description) updates.description = description;
-  if (image) updates.image = image;
+  if (image && filename)
+    updates.image = {
+      imageUrl: image,
+      filename: filename,
+    };
   if (price) updates.price = price;
   if (location) updates.location = location;
   if (country) updates.country = country;

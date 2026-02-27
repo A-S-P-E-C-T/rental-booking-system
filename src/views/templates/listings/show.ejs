@@ -6,13 +6,13 @@
   </div>
 <div class="card show-card listing-card col-lg-6 col-md-10 col-sm-12 offset-lg-3 offset-md-1 mt-3">
   <img
-    src="<%= listing.image %>"
+    src="<%= listing.image.imageUrl %>"
     class="card-img-top show-img"
     alt="listing image"
     style="height: 20rem"
   />
   <div class="card-body">
-    <p class="card-title">Owned by:<b><i> <%= listing.owner.username %></i></b></p>
+    <p class="card-title">Owned by:<b><i> @<%= listing.owner.username %></i></b></p>
     <p class="card-text"><%= listing.description %></p>
     <p class="card-price">
       &#8377;<%= listing.price.toLocaleString("en-In") %> / night
