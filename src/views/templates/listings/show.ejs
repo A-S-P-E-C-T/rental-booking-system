@@ -1,10 +1,10 @@
 <% layout("/layouts/boilerplate.ejs") %>
 
 <div class="row">
-  <div class="col-8 offset-3">
-    <b><h3 class="mt-3"><%= listing.title %></h3></b>
+  <div class="col-lg-6 col-md-10 col-sm-12 offset-lg-3 offset-md-1">
+    <b><h3 class="mt-3 text-center"><%= listing.title %></h3></b>
   </div>
-<div class="card show-card listing-card col-6 offset-3 mt-3">
+<div class="card show-card listing-card col-lg-6 col-md-10 col-sm-12 offset-lg-3 offset-md-1 mt-3">
   <img
     src="<%= listing.image %>"
     class="card-img-top show-img"
@@ -37,8 +37,8 @@
 </div>
 <% if(currUser) { %>
 <div class="create-review row">
-    <h5 class="fw-bold col offset-3">Write a Review:</h5>
-    <form action="/listings/<%= listing._id %>/reviews/create" method="POST" novalidate class="needs-validation col-6 offset-3">
+    <h5 class="fw-bold col-lg-6 col-md-10 col-sm-12 offset-lg-3 offset-md-1">Write a Review:</h5>
+    <form action="/listings/<%= listing._id %>/reviews/create" method="POST" novalidate class="needs-validation col-lg-6 col-md-10 col-sm-12 offset-lg-3 offset-md-1">
       <div class="row">
       <label for="ratedStars" class="fw-bold form-label">Rating:</label>
       <fieldset class="starability-slot">
@@ -61,15 +61,15 @@
       <textarea name="comment" id="comment" placeholder="Write your review here..." class="form-control"></textarea>
       <div class="invalid-feedback">Comment can not be empty</div>
       </div>
-      <div class="row mb-3 justify-content-center">
-      <button class="btn btn-primary col col-lg-2 col-md-3 col-sm-3">Post</button>
+      <div class="text-center">
+        <button class="btn btn-primary mb-3">Post</button>
       </div>
     </form>
   </div>
   <% } %>
   <div class="all-reviews row">
     <%for(review of listing.reviews) { %>
-    <div class="card review-card col-6 offset-3">
+    <div class="card review-card col-lg-6 col-md-10 col-sm-12 offset-lg-3 offset-md-1">
   <div class="card-body">
     <p class="card-title"><b><i>@<%= review.author.username %></i></b></p>
     <p class="starability-result" data-rating="<%= review.ratedStars %>"></p>

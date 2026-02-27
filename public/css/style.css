@@ -125,14 +125,14 @@ main {
     transform: scale(1) !important;
 }
 
-.review-card {
-    margin-bottom: 2rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
-}
-
 .alert {
     width: 50% !important;
     margin-left: auto;
     margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .alert {
+    width: 100% !important;
+  }
 }
