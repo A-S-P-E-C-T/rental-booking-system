@@ -55,26 +55,31 @@ const editListing = asyncHandler(async (req, res) => {
     req.flash("error", "Listing not found!");
     return res.redirect("/listings");
   }
+
+  listing.image.imageUrl = listing.image.imageUrl.replace(
+    "/upload/",
+    "/upload/w_300,h_300,c_fill/",
+  );
+
   return res.render("templates/listings/edit.ejs", { listing });
 });
 
 const updateListing = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!req.file) {
-    req.flash("error", "Image is required.");
-    res.redirect(`/listings/${id}/edit`);
-  }
   const { title, description, price, location, country } = req.body;
-  const { path: image, filename } = req.file;
-
   const updates = {};
+
+  if (req.file) {
+    const { path: image, filename } = req.file;
+    if (image && filename) {
+      updates.image = {
+        imageUrl: image,
+        filename: filename,
+      };
+    }
+  }
   if (title) updates.title = title;
   if (description) updates.description = description;
-  if (image && filename)
-    updates.image = {
-      imageUrl: image,
-      filename: filename,
-    };
   if (price) updates.price = price;
   if (location) updates.location = location;
   if (country) updates.country = country;
