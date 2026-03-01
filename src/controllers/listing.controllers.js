@@ -1,5 +1,6 @@
 import Listing from "../models/listing.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import geocode from "../services/geocode.service.js";
 
 const newListing = (req, res) => {
   return res.render("templates/listings/new.ejs");
@@ -12,12 +13,15 @@ const createListing = asyncHandler(async (req, res) => {
   }
   const { path: image, filename } = req.file;
 
+  const geometry = await geocode(req.body.location);
+
   const newListing = new Listing(req.body);
   newListing.image = {
     imageUrl: image,
     filename: filename,
   };
   newListing.owner = req.user._id;
+  newListing.geometry = geometry;
 
   newListing.save().then((data) => {
     req.flash("success", "Listing created successfully!");
@@ -68,6 +72,7 @@ const updateListing = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { title, description, price, location, country } = req.body;
   const updates = {};
+  const geometry = await geocode(req.body.location);
 
   if (req.file) {
     const { path: image, filename } = req.file;
@@ -83,6 +88,7 @@ const updateListing = asyncHandler(async (req, res) => {
   if (price) updates.price = price;
   if (location) updates.location = location;
   if (country) updates.country = country;
+  if (geometry) updates.geometry = geometry;
 
   const updatedListing = await Listing.findByIdAndUpdate(
     id,

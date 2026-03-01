@@ -14,6 +14,17 @@ const listingSchema = new Schema({
   },
   price: Number,
   location: String,
+  geometry: {
+    type: {
+      type: String, // <-- Mongoose type
+      enum: ["Point"], // <-- allowed value
+      // required: true,
+    },
+    coordinates: {
+      type: [Number],
+      // required: true,
+    },
+  },
   country: String,
   reviews: [
     {
