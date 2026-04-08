@@ -18,6 +18,11 @@ main {
     position: relative;
 }
 
+.navbar-brand{
+    color: #fe424d !important;
+    font-weight: 600;
+}
+
 @media (max-width: 768px) {
   .navbar-collapse {
     position: absolute;
@@ -63,6 +68,10 @@ main {
 
 .nav-link{
     color: #222222 !important;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
 }
 
 .categories {
