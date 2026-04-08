@@ -1,5 +1,6 @@
 import Listing from "../models/listing.model.js";
 import Review from "../models/review.model.js";
+import { ApiError } from "../utils/apiError.js";
 
 const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {

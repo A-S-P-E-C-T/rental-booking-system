@@ -29,18 +29,18 @@ app.use(express.static(path.join(__dirname, "../public")));
 const store = MongoStore.create({
   mongoUrl: process.env.MONGODB_URI,
   crypto : {
-    secret : "MySuperSecretCode"
+    secret : "process.env.MONGO_STORE_SECRET"
   },
   touchAfter: 24*3600
 });
 
-store.on("error", () => {
+store.on("error", (err) => {
   console.log("Error in MONGO SESSION STORE", err);
 })
 
 const sessionOptions = {
   store,
-  secret: "MySuperSecretCode",
+  secret: "process.env.MONGO_STORE_SECRET",
   resave: false,
   saveUninitialized: true,
   cookie: {
