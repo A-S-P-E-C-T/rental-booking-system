@@ -19,6 +19,7 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
@@ -65,6 +66,10 @@ passport.deserializeUser(User.deserializeUser());
 import { listingRouter } from "./routes/listing.routes.js";
 import { reviewRouter } from "./routes/review.routes.js";
 import userRouter from "./routes/user.routes.js";
+
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
 
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
