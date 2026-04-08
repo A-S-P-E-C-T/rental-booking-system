@@ -1,4 +1,5 @@
-import express from "express";
+import "dotenv/config";
+import express from "express";``
 import path from "path";
 import { fileURLToPath } from "url"; // Because ES module does not support __dirname and __filename
 import methodOverride from "method-override";
@@ -29,7 +30,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 const store = MongoStore.create({
   mongoUrl: process.env.MONGODB_URI,
   crypto : {
-    secret : "process.env.MONGO_STORE_SECRET"
+    secret : process.env.MONGO_STORE_SECRET
   },
   touchAfter: 24*3600
 });
@@ -40,13 +41,13 @@ store.on("error", (err) => {
 
 const sessionOptions = {
   store,
-  secret: "process.env.MONGO_STORE_SECRET",
+  secret: process.env.MONGO_STORE_SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
   },
 };
 
